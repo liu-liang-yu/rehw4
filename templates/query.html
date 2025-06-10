@@ -114,6 +114,7 @@
                 </div>
                 <button type="submit" class="action-btn" style="margin-left:8px;">查詢</button>
                 <button type="button" class="action-btn" id="toggle-mode-btn" style="margin-left:8px;">切換查詢模式</button>
+                <button type="button" class="action-btn" id="show-chart-btn" style="margin-left:8px;">顯示折線圖</button>
                 <span id="mode-label" style="margin-left:6px;color:#22781c;font-weight:bold;min-width:110px;display:inline-block;">目前：日期區間查詢</span>
             </form>
             <div id="query-range" style="margin-top:6px;color:#555;font-size:1em;">
@@ -121,6 +122,9 @@
                     查詢範圍：{{ query_range }}
                 {% endif %}
             </div>
+        </div>
+        <div id="chart-container" style="display:none;justify-content:center;margin:16px 0;">
+            <canvas id="result-chart" width="600" height="300"></canvas>
         </div>
         <table>
             <tr>
@@ -141,6 +145,7 @@
             {% endif %}
         </table>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
     // 切換查詢模式（日期/價格）
     const toggleBtn = document.getElementById('toggle-mode-btn');
@@ -161,6 +166,51 @@
             mode = 'date';
         }
     };
+
+    document.getElementById('show-chart-btn').addEventListener('click', function() {
+        const table = document.querySelector('table');
+        const rows = Array.from(table.querySelectorAll('tr')).slice(1); // skip header
+        const labels = [];
+        const data = [];
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 2 && cells[0].innerText !== '查無資料') {
+                labels.push(cells[0].innerText);
+                data.push(parseFloat(cells[1].innerText));
+            }
+        });
+        if (labels.length === 0) {
+            alert('無資料可繪製圖表');
+            return;
+        }
+        document.getElementById('chart-container').style.display = 'flex';
+        const ctx = document.getElementById('result-chart').getContext('2d');
+        if (window.resultChart) window.resultChart.destroy();
+        window.resultChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '價格（元/斤）',
+                    data: data,
+                    borderColor: 'rgba(34,120,28,0.8)',
+                    backgroundColor: 'rgba(34,120,28,0.2)',
+                    fill: true,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    x: { title: { display: true, text: '日期' } },
+                    y: { title: { display: true, text: '價格（元/斤）' } }
+                }
+            }
+        });
+    });
     </script>
 </body>
 </html>
