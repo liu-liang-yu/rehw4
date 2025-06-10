@@ -5,15 +5,51 @@
     <title>登入</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .container { max-width: 350px; margin: 60px auto; background: #fff; padding: 32px 24px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+        .container {
+            max-width: 350px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 32px 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #ccc;
+            text-align: center; /* 置中內容 */
+        }
         h2 { text-align: center; }
-        label { display: block; margin-top: 16px; }
-        input[type=text], input[type=password] { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #bbb; border-radius: 4px; }
-        button { width: 100%; margin-top: 24px; padding: 10px; background: #1976d2; color: #fff; border: none; border-radius: 4px; font-size: 1em; }
+        label { display: block; margin-top: 16px; text-align: center; }
+        input[type=text], input[type=password] {
+            width: 80%;
+            padding: 8px;
+            margin: 4px auto 0 auto;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            display: block; /* 讓 margin auto 生效 */
+            box-sizing: border-box;
+        }
+        button { width: 80%; margin-top: 24px; padding: 10px; background: #1976d2; color: #fff; border: none; border-radius: 4px; font-size: 1em; }
         button:hover { background: #1565c0; }
         .link { display: block; text-align: center; margin-top: 18px; color: #1976d2; text-decoration: none; }
         .link:hover { text-decoration: underline; }
         .msg { color: #d32f2f; text-align: center; margin-top: 10px; }
+
+        .btn-link {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+            color: #1976d2;
+            background: none;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 1em;
+            cursor: pointer;
+            padding: 10px 0;
+            transition: color 0.2s;
+        }
+        .btn-link:hover {
+            text-decoration: underline;
+            background: none;
+        }
     </style>
 </head>
 <body>
@@ -31,12 +67,12 @@
             <input type="password" id="password" name="password" required>
             <button type="submit">登入</button>
         </form>
-        <a class="link" href="/register">還沒有帳號？註冊</a>
+        <a class="link"  href="/register">還沒有帳號？註冊</a>
         <form action="/users" method="get" style="margin-top:10px;">
-            <button type="submit" style="background:#388e3c;">查詢使用者</button>
+            <button type="submit" class="btn-link" >查詢使用者</button>
         </form>
         <form action="/" method="get" style="margin-top:10px;">
-            <button type="submit" style="background:#1976d2;">回首頁</button>
+            <button type="submit" class="btn-link" >回首頁</button>
         </form>
     </div>
 </body>
