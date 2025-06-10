@@ -1,10 +1,12 @@
 # noinspection PyInterpreter
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session, url_for, flash
 import sqlite3
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 DB_NAME = 'cabbage.db'
+app.secret_key = 'your_secret_key_here'  # 請改為安全的隨機字串
 
 def init_db():
     with sqlite3.connect(DB_NAME) as conn:
@@ -14,6 +16,62 @@ def init_db():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# 用戶註冊
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        with sqlite3.connect(DB_NAME) as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT id FROM users WHERE username=?', (username,))
+            if cur.fetchone():
+                flash('用戶名已存在')
+                return redirect(url_for('register'))
+            password_hash = generate_password_hash(password)
+            cur.execute('INSERT INTO users (username, password_hash) VALUES (?, ?)', (username, password_hash))
+            conn.commit()
+        flash('註冊成功，請登入')
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+# 用戶登入
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        with sqlite3.connect(DB_NAME) as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT id, password_hash FROM users WHERE username=?', (username,))
+            user = cur.fetchone()
+            if user and check_password_hash(user[1], password):
+                session['user_id'] = user[0]
+                session['username'] = username
+                flash('登入成功')
+                return redirect(url_for('index'))
+            else:
+                flash('帳號或密碼錯誤')
+    return render_template('login.html')
+
+# 用戶登出
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('已登出')
+    return redirect(url_for('index'))
+
+# 儀表板
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        cur.execute('SELECT query_time, query_content FROM user_queries WHERE user_id=? ORDER BY query_time DESC', (session['user_id'],))
+        records = cur.fetchall()
+    return render_template('dashboard.html', records=records)
 
 @app.route('/add', methods=['POST'])
 def add_price():
@@ -32,6 +90,7 @@ def add_price():
             conn.commit()
     return redirect('/query')
 
+# 修改查詢，記錄用戶查詢紀錄
 @app.route('/query')
 def query():
     start_date = request.args.get('start_date')
@@ -85,6 +144,14 @@ def query():
             query_range = f"{min_price} 元/斤以上"
         elif max_price:
             query_range = f"{max_price} 元/斤以下"
+
+    # 查詢紀錄內容
+    query_content = f"start_date={start_date}, end_date={end_date}, min_price={min_price}, max_price={max_price}"
+    if 'user_id' in session:
+        with sqlite3.connect(DB_NAME) as conn:
+            cur = conn.cursor()
+            cur.execute('INSERT INTO user_queries (user_id, query_content) VALUES (?, ?)', (session['user_id'], query_content))
+            conn.commit()
 
     return render_template('query.html', rows=rows, query_range=query_range)
 
