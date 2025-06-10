@@ -67,10 +67,57 @@ def logout():
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))
+    def format_query_content(content):
+        try:
+            import ast
+            # 先嘗試解析為 dict
+            d = None
+            if isinstance(content, str):
+                try:
+                    d = ast.literal_eval(content)
+                except Exception:
+                    d = None
+            if not isinstance(d, dict):
+                # 嘗試解析 key=value 形式
+                d = {}
+                for part in str(content).split(','):
+                    if '=' in part:
+                        k, v = part.strip().split('=', 1)
+                        d[k.strip()] = v.strip()
+            # 取得欄位
+            start_date = d.get('start_date')
+            end_date = d.get('end_date')
+            min_price = d.get('min_price')
+            max_price = d.get('max_price')
+            # 判斷是否為 None 或空
+            def is_empty(val):
+                return val is None or val == '' or str(val).lower() == 'none'
+            # 價格區間
+            if (not is_empty(min_price)) or (not is_empty(max_price)):
+                if (not is_empty(min_price)) and (not is_empty(max_price)):
+                    return f"價格 {min_price} ~ {max_price} 元/斤"
+                elif not is_empty(min_price):
+                    return f"價格 {min_price} 元/斤以上"
+                elif not is_empty(max_price):
+                    return f"價格 {max_price} 元/斤以下"
+            # 日期區間
+            if (not is_empty(start_date)) or (not is_empty(end_date)):
+                if (not is_empty(start_date)) and (not is_empty(end_date)):
+                    return f"日期 {start_date} ~ {end_date}"
+                elif not is_empty(start_date):
+                    return f"{start_date} 之後"
+                elif not is_empty(end_date):
+                    return f"{end_date} 之前"
+            # 都沒指定
+            return "全部資料"
+        except Exception:
+            return str(content)
     with sqlite3.connect(DB_NAME) as conn:
         cur = conn.cursor()
         cur.execute('SELECT query_time, query_content FROM user_queries WHERE user_id=? ORDER BY query_time DESC', (session['user_id'],))
         records = cur.fetchall()
+        # 將查詢內容格式化
+        records = [(r[0], format_query_content(r[1])) for r in records]
     return render_template('dashboard.html', records=records)
 
 @app.route('/add', methods=['POST'])
