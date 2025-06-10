@@ -12,6 +12,13 @@ def init_db():
     with sqlite3.connect(DB_NAME) as conn:
         with open('schema.sql', 'r', encoding='utf-8') as f:
             conn.executescript(f.read())
+        # 自動補齊 password 欄位
+        cur = conn.cursor()
+        cur.execute("PRAGMA table_info(users)")
+        columns = [row[1] for row in cur.fetchall()]
+        if 'password' not in columns:
+            cur.execute('ALTER TABLE users ADD COLUMN password TEXT')
+            conn.commit()
 
 @app.route('/')
 def index():
@@ -30,7 +37,7 @@ def register():
                 flash('用戶名已存在')
                 return redirect(url_for('register'))
             password_hash = generate_password_hash(password)
-            cur.execute('INSERT INTO users (username, password_hash) VALUES (?, ?)', (username, password_hash))
+            cur.execute('INSERT INTO users (username, password_hash, password) VALUES (?, ?, ?)', (username, password_hash, password))
             conn.commit()
         flash('註冊成功，請登入')
         return redirect(url_for('login'))
@@ -233,6 +240,23 @@ def show_raw():
             cur.execute("INSERT INTO cabbage_prices (date, price, source) VALUES (?, ?, ?)", row)
         conn.commit()
     return redirect('/query')
+
+@app.route('/users')
+def show_users():
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        cur.execute('SELECT username, password_hash, password FROM users')
+        users = cur.fetchall()
+    return render_template('users.html', users=users)
+
+@app.route('/clear_users', methods=['POST'])
+def clear_users():
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        cur.execute('DELETE FROM users')
+        conn.commit()
+    flash('所有使用者資料已清空')
+    return redirect(url_for('show_users'))
 
 if __name__ == '__main__':
     init_db()

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>所有使用者</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 40px auto; background: #fff; padding: 32px 24px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+        h2 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+        th, td { border: 1px solid #bbb; padding: 8px; text-align: left; }
+        th { background: #e3f2fd; }
+        tr:nth-child(even) { background: #f5f5f5; }
+        .link { display: block; text-align: center; margin-top: 18px; color: #1976d2; text-decoration: none; }
+        .link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>所有已註冊使用者</h2>
+        {% if users and users|length > 0 %}
+        <table>
+            <tr>
+                <th>帳號</th>
+                <th>密碼</th>
+            </tr>
+            {% for u in users %}
+            <tr>
+                <td>{{ u[0] }}</td>
+                <td>{{ u[2] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p style="text-align:center; color:#888;">尚無使用者</p>
+        {% endif %}
+        <form action="/clear_users" method="post" style="margin-top:20px; text-align:center;">
+            <button type="submit" style="background:#d32f2f; color:#fff; padding:8px 24px; border:none; border-radius:4px;">清空所有使用者</button>
+        </form>
+        <a class="link" href="/">回首頁</a>
+    </div>
+</body>
+</html>
