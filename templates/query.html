@@ -98,25 +98,23 @@
             </form>
             <a class="action-btn" href="/" style="display:inline-block;margin-left:8px;">回首頁</a>
         </div>
-        <div class="action-bar">
-            <div style="text-align:center;margin-bottom:10px;">
-                <button type="button" class="action-btn" id="toggle-mode-btn">切換查詢模式</button>
-                <span id="mode-label" style="margin-left:10px;color:#22781c;font-weight:bold;">目前：日期區間查詢</span>
-            </div>
-            <form method="get" action="/query" class="inline-form" id="query-form">
-                <div id="date-fields">
+        <div class="action-bar" style="flex-direction:column;align-items:center;">
+            <form method="get" action="/query" class="inline-form" id="query-form" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;">
+                <div id="date-fields" style="display:flex;align-items:center;gap:8px;">
                     <label for="start_date">起始日期：</label>
                     <input type="date" name="start_date" id="start_date">
                     <label for="end_date">結束日期：</label>
                     <input type="date" name="end_date" id="end_date">
                 </div>
-                <div id="price-fields" style="display:none;">
+                <div id="price-fields" style="display:none;align-items:center;gap:8px;">
                     <label for="min_price">最低價格：</label>
                     <input type="number" step="0.01" name="min_price" id="min_price" style="width:80px;">
                     <label for="max_price">最高價格：</label>
                     <input type="number" step="0.01" name="max_price" id="max_price" style="width:80px;">
                 </div>
-                <button type="submit" class="action-btn">查詢</button>
+                <button type="submit" class="action-btn" style="margin-left:8px;">查詢</button>
+                <button type="button" class="action-btn" id="toggle-mode-btn" style="background:#e0f2f1;color:#22781c;border:1px solid #22781c;margin-left:8px;">切換查詢模式</button>
+                <span id="mode-label" style="margin-left:6px;color:#22781c;font-weight:bold;min-width:110px;display:inline-block;">目前：日期區間查詢</span>
             </form>
         </div>
         <table>
@@ -148,11 +146,11 @@
     toggleBtn.onclick = function() {
         if (mode === 'date') {
             dateFields.style.display = 'none';
-            priceFields.style.display = '';
+            priceFields.style.display = 'flex';
             modeLabel.textContent = '目前：價格區間查詢';
             mode = 'price';
         } else {
-            dateFields.style.display = '';
+            dateFields.style.display = 'flex';
             priceFields.style.display = 'none';
             modeLabel.textContent = '目前：日期區間查詢';
             mode = 'date';
