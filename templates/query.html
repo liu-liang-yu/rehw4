@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>高麗菜價格查詢</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f6f8fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 32px 28px 24px 28px;
+        }
+        h1 {
+            text-align: center;
+            color: #2d7a36;
+            margin-bottom: 28px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #fafbfc;
+        }
+        th, td {
+            padding: 10px 8px;
+            text-align: center;
+        }
+        th {
+            background: #e0f2f1;
+            color: #2d7a36;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #f1f8e9;
+        }
+        tr:hover {
+            background: #e3f2fd;
+        }
+        .no-data {
+            text-align: center;
+            color: #888;
+            padding: 18px 0;
+        }
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .inline-form {
+            display: inline-block;
+            margin: 0;
+        }
+        .action-btn {
+            background: #22781c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 18px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+            margin: 0;
+        }
+        .action-btn:hover {
+            background: #175111;
+            color: #fff;
+        }
+        .action-btn.warn {
+            background: #22781c;
+            color: #fff;
+        }
+        .action-btn.warn:hover {
+            background: #175111;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>高麗菜價格紀錄</h1>
+        <div style="text-align:center;margin-bottom:18px;">
+            <form action="/show_raw" method="post" class="inline-form" style="display:inline-block;">
+                <button type="submit" class="action-btn warn">原始紀錄</button>
+            </form>
+            <a class="action-btn" href="/" style="display:inline-block;margin-left:8px;">回首頁</a>
+        </div>
+        <div class="action-bar">
+            <div style="text-align:center;margin-bottom:10px;">
+                <button type="button" class="action-btn" id="toggle-mode-btn">切換查詢模式</button>
+                <span id="mode-label" style="margin-left:10px;color:#22781c;font-weight:bold;">目前：日期區間查詢</span>
+            </div>
+            <form method="get" action="/query" class="inline-form" id="query-form">
+                <div id="date-fields">
+                    <label for="start_date">起始日期：</label>
+                    <input type="date" name="start_date" id="start_date">
+                    <label for="end_date">結束日期：</label>
+                    <input type="date" name="end_date" id="end_date">
+                </div>
+                <div id="price-fields" style="display:none;">
+                    <label for="min_price">最低價格：</label>
+                    <input type="number" step="0.01" name="min_price" id="min_price" style="width:80px;">
+                    <label for="max_price">最高價格：</label>
+                    <input type="number" step="0.01" name="max_price" id="max_price" style="width:80px;">
+                </div>
+                <button type="submit" class="action-btn">查詢</button>
+            </form>
+        </div>
+        <table>
+            <tr>
+                <th>日期</th>
+                <th>價格（元/斤）</th>
+                <th>資料來源</th>
+            </tr>
+            {% if rows and rows|length > 0 %}
+            {% for row in rows %}
+            <tr>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>{% if row[2] %}<a href="{{ row[2] }}" target="_blank">來源連結</a>{% else %}-{% endif %}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr><td colspan="3" class="no-data">查無資料</td></tr>
+            {% endif %}
+        </table>
+    </div>
+    <script>
+    // 切換查詢模式（日期/價格）
+    const toggleBtn = document.getElementById('toggle-mode-btn');
+    const modeLabel = document.getElementById('mode-label');
+    const dateFields = document.getElementById('date-fields');
+    const priceFields = document.getElementById('price-fields');
+    let mode = 'date';
+    toggleBtn.onclick = function() {
+        if (mode === 'date') {
+            dateFields.style.display = 'none';
+            priceFields.style.display = '';
+            modeLabel.textContent = '目前：價格區間查詢';
+            mode = 'price';
+        } else {
+            dateFields.style.display = '';
+            priceFields.style.display = 'none';
+            modeLabel.textContent = '目前：日期區間查詢';
+            mode = 'date';
+        }
+    };
+    </script>
+</body>
+</html>

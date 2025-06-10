@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>高麗菜價格輸入</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f6f8fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 32px 28px 24px 28px;
+        }
+        h1 {
+            text-align: center;
+            color: #2d7a36;
+            margin-bottom: 28px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 500;
+        }
+        input[type="date"],
+        input[type="number"],
+        input[type="url"] {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 18px;
+            border: 1px solid #cfd8dc;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        button[type="submit"] {
+            width: 100%;
+            background: #2d7a36;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 0;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+        button[type="submit"]:hover {
+            background: #256428;
+        }
+        .clear-btn {
+            background: #e53935;
+        }
+        .clear-btn:hover {
+            background: #b71c1c;
+        }
+        .link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #1976d2;
+            text-decoration: none;
+            font-size: 1em;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+        .query-btn {
+            width: 100%;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 0;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .query-btn:hover {
+            background: #1565c0;
+        }
+        .home-link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #1976d2;
+            text-decoration: none;
+            font-size: 1em;
+        }
+        .home-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>新增高麗菜價格</h1>
+        <form action="/add" method="post">
+            <label for="date">日期：</label>
+            <input type="date" name="date" id="date" required>
+            <label for="price">價格（元/斤）：</label>
+            <input type="number" name="price" id="price" step="0.1" min="0" required>
+            <label for="source">資料來源網址：</label>
+            <input type="url" name="source" id="source">
+            <button type="submit">送出</button>
+        </form>
+        <form action="/clear" method="post" style="margin-top:16px;">
+            <button type="submit" class="clear-btn" onclick="return confirm('確定要清除所有價格紀錄嗎？');">清除所有價格紀錄</button>
+        </form>
+        <a class="query-btn" href="/query">高麗菜價格紀錄</a>
+    </div>
+</body>
+</html>
