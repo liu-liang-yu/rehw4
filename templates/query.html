@@ -116,6 +116,11 @@
                 <button type="button" class="action-btn" id="toggle-mode-btn" style="margin-left:8px;">切換查詢模式</button>
                 <span id="mode-label" style="margin-left:6px;color:#22781c;font-weight:bold;min-width:110px;display:inline-block;">目前：日期區間查詢</span>
             </form>
+            <div id="query-range" style="margin-top:6px;color:#555;font-size:1em;">
+                {% if query_range %}
+                    查詢範圍：{{ query_range }}
+                {% endif %}
+            </div>
         </div>
         <table>
             <tr>

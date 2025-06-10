@@ -68,7 +68,25 @@ def query():
         cur = conn.cursor()
         cur.execute(query, params)
         rows = cur.fetchall()
-    return render_template('query.html', rows=rows)
+
+    # 構建查詢範圍描述
+    query_range = None
+    if start_date or end_date:
+        if start_date and end_date:
+            query_range = f"{start_date} ~ {end_date}"
+        elif start_date:
+            query_range = f"{start_date} 之後"
+        elif end_date:
+            query_range = f"{end_date} 之前"
+    elif min_price or max_price:
+        if min_price and max_price:
+            query_range = f"{min_price} ~ {max_price} 元/斤"
+        elif min_price:
+            query_range = f"{min_price} 元/斤以上"
+        elif max_price:
+            query_range = f"{max_price} 元/斤以下"
+
+    return render_template('query.html', rows=rows, query_range=query_range)
 
 @app.route('/clear', methods=['POST'])
 def clear():
